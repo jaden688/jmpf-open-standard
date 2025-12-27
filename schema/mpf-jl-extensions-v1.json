@@ -1,0 +1,16 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "MPF JL Personality Spec v1",
+  "type": "object",
+  "required": ["schema_version","id","name","kind","identity","behavior","safety"],
+  "properties": {
+    "schema_version": {"type":"string","const":"mpf-jl-extensions-v1"},
+    "id": {"type":"string"},
+    "name": {"type":"string"},
+    "kind": {"type":"string","enum":["personality"]},
+    "identity": {"type":"object"},
+    "behavior": {"type":"object"},
+    "safety": {"type":"object"},
+    "extensions": {"type":"object"}
+  }
+}

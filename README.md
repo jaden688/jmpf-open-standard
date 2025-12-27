@@ -1,2 +1,17 @@
-# jmpf-open-standard
-Open, model-agnostic personality format for LLMs. Defines identity, behavior, and safety in a simple JSON schema, with optional jl_engine extensions. Includes examples and a tiny Python loader/validator for building portable, reusable AI personas.
+# JL MPF Personality Spec (with JL Extensions)
+
+This repository defines an open, model‑agnostic personality format.
+
+The core is intentionally simple and reusable (`identity`, `behavior`, `safety`).
+Advanced features for the JL Engine live under the namespaced block:
+
+```
+"extensions": { "jl_engine": { ... } }
+```
+
+Tools that don't understand the extension can safely ignore it.
+
+## Contents
+- JSON Schema for validation
+- Example personalities
+- A tiny Python reference loader/validator

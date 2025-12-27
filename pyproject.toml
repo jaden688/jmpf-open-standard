@@ -1,0 +1,17 @@
+[build-system]
+requires = ["setuptools>=61.0"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "jl-mpf-spec"
+version = "0.1.0"
+description = "MPF personality schema with JL Engine extensions and reference loader."
+requires-python = ">=3.9"
+license = { text = "MIT" }
+dependencies = ["jsonschema>=4.0.0"]
+
+[tool.setuptools]
+package-dir = {"" = "python"}
+
+[tool.setuptools.packages.find]
+where = ["python"]
