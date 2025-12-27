@@ -18,3 +18,6 @@ where = ["python"]
 
 [project.scripts]
 mpf = "jl_mpf_spec.cli:main"
+
+[tool.setuptools.package-data]
+jl_mpf_spec = ["schema/*.json"]
