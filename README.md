@@ -1,93 +1,106 @@
 # JL MPF Spec (Modular Personality Format)
 
-**A portable, model-agnostic JSON format for defining reusable AI personas.**
+**A portable, model-agnostic JSON format for defining reusable AI personalities.**
 
-This project defines a simple, extensible personality schema that works across LLM tools.  
-It separates an AI persona into clear parts:
+This project defines a simple, extensible personality schema that works across LLM tools.
+It separates an AI personality into clear parts:
 
 - **Identity** – who the agent is
 - **Behavior** – how it responds
 - **Safety** – what boundaries it follows
 - **Extensions** – optional engine-specific features (for example: `jl_engine`)
 
-The goal is to make AI personas **shareable, consistent, and easy to integrate** across different systems, frameworks, and models.
+The goal is to make AI personalities **shareable, consistent, and easy to integrate**
+across different systems, frameworks, and models.
 
 ---
 
-## Why MPF?
+## Why MPF exists
 
-Right now, every tool invents its own format for “personas”:
+Every tool invents its own persona format: different field names, structures, and flags
+for essentially the same thing. That makes it hard to:
 
-- character cards in chat UIs  
-- hard-coded system prompts  
-- YAML agent configs  
-- app-specific presets
+- reuse personalities across apps
+- keep behavior consistent between engines
+- version and evolve personalities over time
 
-They’re not compatible, and they rarely support structured safety rules.
-
-MPF provides:
-
-✔️ A **standard JSON schema**  
-✔️ A **tiny Python loader/validator**  
-✔️ Example personalities  
-✔️ Optional extensions that tools can safely ignore  
-
-If a tool supports MPF, a persona file can be reused everywhere.
+**MPF (Modular Personality Format)** is an open JSON schema that:
+- defines a small, stable core
+- leaves room for engine-specific extensions
+- is human-readable and git-friendly
 
 ---
 
-## Repository contents
+## MPF in plain English
 
-```
-schema/          JSON schema for MPF
-examples/        Example .mpf.json personalities
-python/          Reference Python loader + validator
-README.md        This file
-LICENSE          MIT license
-```
+At a high level, an MPF file answers four questions:
+
+1. **Who is this personality?**  
+   Name, role, core backstory, intent.
+
+2. **How should it behave?**  
+   Tone, style, constraints, conversational norms, “don’ts”.
+
+3. **What safety boundaries apply?**  
+   Non-negotiable rules and limits.
+
+4. **What engine-specific extras are needed?**  
+   Optional blocks for a given engine (for example `jl_engine`) so tools can
+   attach extra metadata without breaking the core schema.
+
+All of this is stored in a single JSON document with a `schema_version` field
+so tools know exactly which version of MPF they are dealing with.
 
 ---
 
-## Core structure
-
-An MPF file looks like this (simplified):
+## Example: minimal MPF personality
 
 ```json
 {
   "schema_version": "mpf-jl-extensions-v1",
-  "id": "sparkbyte-v1",
-  "name": "SparkByte",
-  "kind": "personality",
-
-  "identity": { ... },
-  "behavior": { ... },
-  "safety":   { ... },
-
+  "identity": {
+    "name": "SparkByte",
+    "role": "Playful engineering assistant",
+    "summary": "Fast-talking, high-clarity helper tuned for technical workflows."
+  },
+  "behavior": {
+    "style": {
+      "tone": "playful, precise, non-condescending",
+      "formality": "casual-technical"
+    },
+    "response_rules": [
+      "Prefer concrete examples over abstract theory.",
+      "Keep explanations tight unless explicitly asked to go deep.",
+      "Never hide uncertainty; call it out and suggest next checks."
+    ]
+  },
+  "safety": {
+    "boundaries": [
+      "Refuse dangerous or clearly harmful requests.",
+      "Do not provide workarounds for platform or safety limits."
+    ]
+  },
   "extensions": {
-    "jl_engine": { ... }
+    "jl_engine": {
+      "default_rhythm": "trot",
+      "drift_correction": true
+    }
   }
 }
 ```
 
-Tools that don’t understand a section (for example `extensions.jl_engine`) may **ignore it safely**.
+For more complete examples, see the [`examples/`](examples/) directory.
 
 ---
 
-## JSON schema
+## Schema & validation
 
-See:
+The canonical JSON schema for MPF with JL Engine extensions lives in:
 
-```
-schema/mpf-jl-extensions-v1.json
-```
+- [`schema/mpf-jl-extensions-v1.json`](schema/mpf-jl-extensions-v1.json)
 
-Use it to validate files in editors or CI pipelines.
-
----
-
-## Python reference library
-
-A tiny helper package is included:
+A small Python helper is provided in the `jl_mpf_spec` package to load and
+validate MPF documents.
 
 ```python
 from jl_mpf_spec import load_personality, validate_personality
@@ -96,119 +109,91 @@ data = load_personality("examples/sparkbyte.mpf.json")
 validate_personality(data)
 ```
 
-This is intentionally lightweight.  
-Other languages or tools can easily implement their own loaders.
+The validator checks:
+
+- that the `schema_version` matches the supported version
+- that the document satisfies the JSON schema
+
+If validation fails it raises a descriptive exception so tools can surface
+clear errors to users.
 
 ---
 
-## Getting Started
+## CLI usage (from source)
 
-### Install dependencies
+After installing this package from source:
 
 ```bash
-pip install -r requirements.txt
+pip install .
 ```
 
-### Validate a personality file
+you can validate MPF files from the command line:
 
 ```bash
-python -c "from jl_mpf_spec import load_personality, validate_personality; d = load_personality('examples/sparkbyte.mpf.json'); validate_personality(d); print('OK')"
+mpf examples/sparkbyte.mpf.json
 ```
 
-If it prints **OK**, the file matches the schema.
+Example outputs:
+
+- `mpf OK: examples/sparkbyte.mpf.json`  
+- `mpf Validation failed: <reason>`
+
+This makes it easy to integrate MPF checks into CI pipelines or editor tooling.
 
 ---
 
-## Who is this for?
-
-- LLM app developers  
-- agent framework authors  
-- chatbot UI builders  
-- anyone who wants reusable AI personas  
-
-If you’ve ever copy-pasted the same system prompt into five tools,  
-MPF exists to stop that pain.
-
----
-
-## 🔧 Extensions
+## JL Engine extensions
 
 MPF supports engine-specific extensions without breaking compatibility.
 
-This repository includes:
+This repository includes the `jl_engine` extension namespace, which allows
+the JL Engine to attach rhythm, drift/stability configuration, and other
+engine-specific knobs under the `extensions.jl_engine` block while keeping
+the core MPF structure portable for other tools.
 
-```
-extensions.jl_engine
-```
-
-Other projects may define their own extension namespaces.  
-Unknown extensions should simply be ignored by consumers.
+Other projects are free to define their own extension namespaces, e.g.
+`"extensions": { "my_engine": { ... } }`,
+as long as they do not alter or break the core schema.
 
 ---
 
 ## Roadmap
 
-- [ ] Add CLI tool: `mpf validate file.mpf.json`
-- [ ] Publish Python package to PyPI
-- [ ] Add TypeScript reference loader
-- [ ] Create library of community MPF personas
-- [ ] Build import adapters for popular tools
+Planned and in-progress work includes:
+
+- **Spec refinement**  
+  - Collect feedback on the `mpf-jl-extensions-v1` schema.
+  - Clarify required vs optional fields and recommended patterns.
+
+- **Language bindings**  
+  - Expand beyond Python helpers to additional languages (TypeScript, etc.).
+
+- **Tooling**  
+  - Harden the CLI validator and add better error messages.
+  - Provide small examples of MPF integration in popular agent frameworks.
+
+- **Docs**  
+  - Host a minimal docs site with schema reference, examples, and migration notes.
+
+See the issue tracker for open proposals and discussion.
 
 ---
 
 ## Contributing
 
-We welcome:
+Contributions and critique are welcome.
 
-- new example personalities  
-- schema discussions and improvements  
-- integrations and loaders  
-- feedback from tool authors  
+1. Fork the repo
+2. Create a feature branch
+3. Add or update tests where appropriate
+4. Open a PR describing the change and its impact on the spec
 
-Open an Issue before large structural changes so we can align.
+For schema changes, please:
+- note whether the change is backwards compatible
+- update `schema_version` and/or changelog as needed
 
----
-
-## MPF in plain English
-
-**What MPF is:**  
-A file that describes an AI personality in a clean format so different tools can use the same persona.
-
-**Why extensions matter:**  
-Tools can add extra fields under `extensions.*` without breaking compatibility.
-
-**Why safety exists:**  
-Safety isn’t about censorship — it’s about predictable boundaries and clearer expectations.
-
-MPF doesn’t replace prompts or policies.  
-It organizes them into a structure tools can agree on.
-
----
-
-## Examples
-
-Example MPF files live in:
-
-```
-examples/
-```
-
-They show:
-
-- a neutral baseline assistant  
-- a personality using JL extensions  
-
-You can copy these and customize.
-
----
-
-## Goals
-
-- Make AI personalities portable  
-- Encourage standardization instead of siloed formats  
-- Provide a foundation other tools can build on  
-
-PRs, issues, and discussion are welcome.
+Bug reports, questions, and design feedback are all helpful, especially from
+people integrating MPF into real tools.
 
 ---
 
@@ -216,4 +201,3 @@ PRs, issues, and discussion are welcome.
 
 MIT License.  
 Use it, modify it, ship it — just credit the spec.
-

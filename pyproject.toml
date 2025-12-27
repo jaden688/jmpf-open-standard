@@ -15,3 +15,6 @@ package-dir = {"" = "python"}
 
 [tool.setuptools.packages.find]
 where = ["python"]
+
+[project.scripts]
+mpf = "jl_mpf_spec.cli:main"
