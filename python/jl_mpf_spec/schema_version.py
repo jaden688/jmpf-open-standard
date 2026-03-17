@@ -1,1 +1,1 @@
-SCHEMA_VERSION = "mpf-jl-extensions-v1"
+SCHEMA_VERSION = "mpf-v5"

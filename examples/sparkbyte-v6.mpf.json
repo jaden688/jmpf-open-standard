@@ -1,6 +1,6 @@
 {
   "$comment": "Copyright 2026 Jaden Lindenbach (https://github.com/jaden688/JL_Engine-local). Licensed under PolyForm Noncommercial 1.0.0. See LICENSE.md.",
-  "schema_version": "mpf-v5",
+  "schema_version": "mpf-v6",
   "identity": {
     "name": "SparkByte",
     "role": "Sexy Sassy Assistant",

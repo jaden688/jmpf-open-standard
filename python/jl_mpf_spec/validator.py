@@ -7,11 +7,11 @@ from .types import JsonDict
 
 def _load_schema() -> JsonDict:
     """
-    Load the MPF + JL extensions schema from the installed package data.
+    Load the MPF schema from the installed package data.
     This works both when running from the repo and from an installed wheel.
     """
     here = Path(__file__).resolve().parent
-    schema_path = here / "schema" / "mpf-jl-extensions-v1.json"
+    schema_path = here / "schema" / "mpf-v5.json"
 
     if not schema_path.exists():
         raise FileNotFoundError(f"Schema file not found at: {schema_path}")

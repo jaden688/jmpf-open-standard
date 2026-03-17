@@ -1,15 +1,15 @@
 {
   "$schema": "http://json-schema.org/draft-07/schema#",
-  "$id": "https://jl-engine.dev/schemas/mpf/jl-extensions-v5.json",
+  "$id": "https://jl-engine.dev/schemas/mpf/mpf-v5.json",
   "$comment": "Copyright 2026 Jaden Lindenbach (https://github.com/jaden688/JL_Engine-local). Licensed under PolyForm Noncommercial 1.0.0. See LICENSE.md.",
-  "title": "MPF JL Engine Extensions v5",
-  "description": "Extended Modular Personality Format with cognitive modes, emotional palettes, and engine-specific gating.",
+  "title": "Modular Personality Format v5",
+  "description": "Portable, model-agnostic JSON schema for agent personalities. Supports rich personality definitions with cognitive modes, emotional dynamics, and safety boundaries.",
   "type": "object",
   "required": ["schema_version", "name", "kind"],
   "properties": {
     "schema_version": {
       "type": "string",
-      "const": "mpf-jl-extensions-v5",
+      "const": "mpf-v5",
       "description": "MPF schema version identifier"
     },
     "name": {
@@ -88,7 +88,7 @@
     },
     "engine_alignment": {
       "$ref": "#/definitions/loose_object",
-      "description": "Engine-specific gating, routing, and state modulation"
+      "description": "Runtime-specific routing and behavioral modulation parameters"
     },
     "llm_profiles": {
       "$ref": "#/definitions/llm_profiles"
@@ -126,11 +126,6 @@
     "meta": {
       "$ref": "#/definitions/loose_object",
       "description": "Metadata, versioning, authoring info"
-    },
-    "extensions": {
-      "type": "object",
-      "additionalProperties": true,
-      "description": "Engine-specific extensions (reserved for future use)"
     }
   },
   "anyOf": [
